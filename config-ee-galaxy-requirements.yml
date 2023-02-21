@@ -15,6 +15,8 @@ collections:
     version: 21.12.0
   - name: azure.azcollection
     version: 1.14.0
+  - name: community.crypto
+    version: 2.10.0
   - name: community.general
     version: 6.3.0
   - name: community.windows
