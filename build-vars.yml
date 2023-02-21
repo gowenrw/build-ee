@@ -1,7 +1,17 @@
 ---
-# Variable for build-ee playbook
+# Variables for build-ee playbook
+#
+# ee_name is the image name for the execution environment
 ee_name: cloud-creator-awx-ee
+# ee_dir is the build directory where the build artifacts are created
 ee_dir: "~/ee/{{ ee_name }}"
-ee_version: 2
+# ee_version is the version tag for the image
+ee_version: 2.1
+# ee_publish is a boolean to toggle publishing the image to a container repository
+# change ee_publish to true to have the image published after build is done
 ee_publish: false
-ee_publush_url: "docker.io/myuser" # no starting docker:// or trailing /image-name as those will be appended
+# ee_publish_url is the container repository to publish the image to
+# This should not start with 'docker://'' or end with '/'' or '/image-name' as those are appended
+# This is the base url for the main container repository area where container repos are stored
+# If using docker hub like I do then change 'altbier' below to your docker hub username
+ee_publush_url: "docker.io/altbier"

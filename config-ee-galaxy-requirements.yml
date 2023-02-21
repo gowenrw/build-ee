@@ -3,6 +3,8 @@
 collections:
   - name: amazon.aws
     version: 5.2.0
+  - name: ansible.netcommon
+    version: 4.1.0
   - name: ansible.posix
     version: 1.5.1
   - name: ansible.utils
@@ -25,6 +27,8 @@ collections:
     version: 2.4.0
   - name: openstack.cloud
     version: 2.0.0
+  - name: ovirt.ovirt
+    version: 3.1.0
   - name: redhatinsights.insights
     version: 1.0.7
   - name: theforeman.foreman
