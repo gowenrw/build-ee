@@ -2,11 +2,12 @@
 # Variables for build-ee playbook
 #
 # ee_name is the image name for the execution environment
+#ee_name: cloud-creator-awx-ee
 ee_name: cloud-creator-awx-ee
 # ee_dir is the build directory where the build artifacts are created
 ee_dir: "~/ee/{{ ee_name }}"
 # ee_version is the version tag for the image
-ee_version: 2.2
+ee_version: 2.3
 # ee_publish is a boolean to toggle publishing the image to a container repository
 # change ee_publish to true to have the image published after build is done
 ee_publish: false
