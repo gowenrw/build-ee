@@ -12,21 +12,21 @@ I have published this build to docker hub which can be pulled with this podman c
 podman pull docker.io/altbier/cloud-creator-awx-ee:latest
 ```
 
+## Requirements
+
+This code has been refactored to use ansible-builder version 3+ and is not backwards compatable with previous versions due to the configuration file version changes.
+
 ## Configuring
 
 These are the configuration files
 * [config-ee.yml](./config-ee.yml)
-  * This is the main config file that calls the other two
-* [config-ee-galaxy-requirements.yml](./config-ee-galaxy-requirements.yml)
-  * This is the list of ansible collections to install in the ee
-  * Python modules required by these collections will also be installed
-  * Collections without a version will pull the latest
-* [config-ee-python-requirements.txt](./config-ee-python-requirements.txt)
-  * This is the list of Python modules to install in addition to above
-  * Modules without a version will pull the latest
+  * This is the main config file that contains all the container settings
+  * The galaxy section has a list of ansible collections to install in the ee
+  * The python section has a list of Python modules to install in the ee
+  * The system section has a list of system level packages to install in the ee
 * [build-vars.yml](./build-vars.yml)
   * This is the variable file for the build-ee playbook
-  * There are several settings that can be tweaked here
+  * There are several settings that can be tweaked here including the ee_name
   * The version here is used as a tag when pushing to a registry
 
 ## Running
@@ -43,10 +43,6 @@ If we were to use ansible-navigator it's use of an execution environment would c
 ## Environment
 
 This has been tested on CentOS Stream 9 and RHEL 9 systems with the following installed:
-* ansible-core
-* podman
-
-These can be installed via yum:
-```
- sudo yum install ansible-core podman
-```
+* ansible-core >= 2.15.0
+* ansible-builder >= 3.0.0
+* podman >= 4.6.0

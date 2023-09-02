@@ -1,7 +1,0 @@
-# python requirements (beyond what galaxy collections speficy)
-ansible-core >=2.13
-pyOpenSSL >=19.1
-# community.general.dig requires dnspython module but isnt installed by collecion
-dnspython
-# cryptography version >37 has blowfish errors and <35 is missing required features
-cryptography >35,<37
