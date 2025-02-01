@@ -1,78 +1,77 @@
 ---
 version: 3
-
+# Note the version here is the ansible builder template version
+# and has nothing to do with your ee image version tag
 images:
   base_image:
     name: quay.io/centos/centos:stream9
-
-#build_arg_defaults:
-#  ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: '--pre'
-
+#
 dependencies:
+  python_interpreter:
+    package_system: python3.11
+    python_path: /usr/bin/python3.11
   ansible_core:
+    # Require minimum of 2.15 to get ansible-inventory --limit option
     package_pip: ansible-core>=2.15.0rc2,<2.16
   ansible_runner:
     package_pip: ansible-runner
   galaxy: |
     ---
     collections:
-      # These are in awx-ee
+      # These are from awx.ee
       - name: amazon.aws
-        version: 6.3.0
       - name: ansible.posix
-        version: 1.5.4
       - name: ansible.windows
-        version: 2.1.0
       - name: awx.awx
-        version: 23.0.0
       - name: azure.azcollection
-        version: 1.17.0
+        version: "==2.7.0"
       - name: community.vmware
-        version: 3.9.0
       - name: google.cloud
-        version: 1.2.0
       - name: kubernetes.core
-        version: 2.4.0
+      - name: kubevirt.core
       - name: openstack.cloud
-        version: 2.1.0
       - name: ovirt.ovirt
-        version: 3.1.3
       - name: redhatinsights.insights
-        version: 1.0.8
       - name: theforeman.foreman
-        version: 3.13.0
       # These are what I added
       - name: ansible.netcommon
-        version: 5.1.2
+      - name: ansible.network
+      - name: ansible.security
+      - name: ansible.snmp
       - name: ansible.utils
-        version: 2.10.3
+      - name: ansible.yang
+      - name: cloud.common
+      - name: cloud.terraform
       - name: community.crypto
-        version: 2.15.1
       - name: community.general
-        version: 7.3.0
       - name: community.windows
-        version: 2.0.0
       - name: containers.podman
-        version: 1.10.3
   system: |
-    # These are in awx-ee
+    # These are from awx-ee modified slightly for my use
     git-core [platform:rpm]
-    python3.9-devel [platform:rpm compile]
+    python3.11-devel [platform:rpm compile]
     libcurl-devel [platform:rpm compile]
     krb5-devel [platform:rpm compile]
     krb5-workstation [platform:rpm]
     subversion [platform:rpm]
-    subversion [platform:dpkg]
     git-lfs [platform:rpm]
     sshpass [platform:rpm]
     rsync [platform:rpm]
     epel-release [platform:rpm]
-    python-unversioned-command [platform:rpm]
     unzip [platform:rpm]
+    podman-remote [platform:rpm]
+    openssl-devel [platform:rpm compile]
+    #   Build Tools - Changed to RPM only so we can dnf remove later
+    cmake [platform:rpm]
+    gcc [platform:rpm]
+    gcc-c++ [platform:rpm]
+    make [platform:rpm]
     # These are what I added
+    libxml2-devel [platform:rpm]
   python: |
-    # These are in awx-ee
-    git+https://github.com/ansible/ansible-sign
+    # These are from awx-ee
+    #   Changed ansible-sign from git compile to python install
+    ansible-sign
     ncclient
     paramiko
     pykerberos
@@ -84,27 +83,31 @@ dependencies:
     python-daemon
     pyyaml
     six
+    receptorctl
     # These are what I added
-    # community.general.dig requires dnspython module but isnt installed by collecion
     dnspython
-
-#options:
-#  package_manager_path: /usr/bin/microdnf
-
+    jsonpatch
+    netaddr
+    xmltodict
+#
+options:
+  package_manager_path: /usr/bin/dnf
+#
 #additional_build_files:
 #  - src: files/ansible.cfg
 #    dest: configs
-
+#
 additional_build_steps:
+#  prepend_base:
 #  prepend_galaxy:
-#    - ADD _build/configs/ansible.cfg ~/.ansible.cfg
-#  prepend_final: |
-#    RUN whoami
-#    RUN cat /etc/os-release
+#  prepend_final:
   append_base:
     - RUN $PYCMD -m pip install -U pip
   append_final:
+    # The following are from ansible/awx-ee
     - COPY --from=quay.io/ansible/receptor:devel /usr/bin/receptor /usr/bin/receptor
-    - RUN mkdir -p /var/run/receptor
-    - RUN git lfs install --system
-
+    - RUN mkdir -p /var/run/receptor && git lfs install --system
+    # SymLink `python` -> `python3.11`
+    - RUN alternatives --install /usr/bin/python python /usr/bin/python3.11 311 && alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 311
+    # Remove build tools and clean
+    - RUN dnf remove -y make cmake gcc gcc-c++ cpp && dnf clean all && rm -rf /tmp/*
