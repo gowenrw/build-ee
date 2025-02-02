@@ -4,67 +4,82 @@
   vars_files:
     - build-vars.yml
   tasks:
+    #
+    - name: Remove EE build directory if created by previous build
+      ansible.builtin.file:
+        path: "{{ ee_dir }}"
+        state: absent
+      when: ee_build
+    #
+    - name: Create EE build directory
+      ansible.builtin.file:
+        path: "{{ ee_dir }}"
+        state: directory
+      when: ee_build
+    #
     - name: Copy build files to build directory
       ansible.builtin.copy:
         src: "{{ item }}"
         dest: "{{ ee_dir }}/"
-      with_fileglob: "config-ee*"
-
-    - name: Remove EE context from previous builds
-      ansible.builtin.file:
-        path: "{{ ee_dir }}/context"
-        state: absent
-
-    - name: Create new EE context
-      ansible.builtin.shell:
-        chdir: "{{ ee_dir }}"
-        cmd: "ansible-builder create -v3 --file config-ee.yml"
-
+      with_fileglob: "config-ee.yml"
+      when: ee_build
+    #
+    #
+    # BUILD
     - name: EE Build Block
       block:
-        - name: Build the EE - This can take a LONG time - set a 20min async timeout
+        - name: Build the EE - This can take a LONG time - set a 60min async timeout
           ansible.builtin.shell:
             chdir: "{{ ee_dir }}"
-            #cmd: "podman build -f context/Containerfile --tag={{ ee_name }}:{{ ee_version }} context"
-            cmd: "ansible-builder build -v3 --file config-ee.yml --tag={{ ee_name }}:{{ ee_version }} --prune-images"
-          async: 1200
+            cmd: "ansible-builder build -v3 --file config-ee.yml --tag={{ ee_name }}:{{ ee_version }} --squash all"
+          async: 3600
           poll: 15
           register: reg_buildee_result
+        #
         - name: Tag the new EE build with latest
           ansible.builtin.shell:
             chdir: "{{ ee_dir }}"
             cmd: "podman tag {{ ee_name }}:{{ ee_version }} {{ ee_name }}:latest"
           register: reg_tagee_result
+        #
       always:
         # Make sure we prune all the temp images even in a failure
         - name: Prune unused images
           ansible.builtin.shell:
-            cmd: "podman image prune -f"
+            cmd: "podman image prune -f --external"
         # Show build results
         - name: "Show build results"
           ansible.builtin.debug:
             var: reg_buildee_result
             # Change this to 0 to see output without -v
             verbosity: 1
+        #
         - name: "Write build result to log file"
           ansible.builtin.copy:
-            content: "{{ reg_buildee_result }}"
-            dest: "{{ ee_dir }}/buildee_results.log"
+            content: "{{ reg_buildee_result | to_nice_json }}"
+            dest: "{{ ee_dir }}/buildee_results.log.json"
         # Debug tag latest results
         - name: "Debug tag latest results"
           ansible.builtin.debug:
             var: reg_tagee_result
             verbosity: 1
-    - name: EE Build Block
+      when: ee_build
+    #
+    #
+    # PUBLISH
+    - name: EE Publish Block
       block:
-        - name: Publish the ee image to a container registry
+        - name: Publish the ee image with version tag to container registry
           ansible.builtin.shell:
-            cmd: "podman push localhost/{{ ee_name }} docker://{{ ee_publush_url }}/{{ ee_name }}:{{ ee_version }}"
+            cmd: "podman push localhost/{{ ee_name }}:{{ ee_version }} docker://{{ ee_publush_url }}/{{ ee_name }}:{{ ee_version }}"
           register: reg_publish_results
-        - name: Publish the ee image latest tag to a container registry
+        # LATEST TAG
+        - name: Publish the ee image with latest tag to container registry
           ansible.builtin.shell:
-            cmd: "podman push localhost/{{ ee_name }} docker://{{ ee_publush_url }}/{{ ee_name }}:latest"
+            cmd: "podman push localhost/{{ ee_name }}:{{ ee_version }} docker://{{ ee_publush_url }}/{{ ee_name }}:latest"
           register: reg_publish_latest_results
+          when: ee_publish_latest
+        #
       rescue:
         # Debug Failure Results
         - name: "Debug failure results"
@@ -84,7 +99,7 @@
               - "podman login -u <docker-username> -p <docker-passwd-or-token> docker.io/<docker-username>"
               - ""
               - "After providing credentials attempt to publish again using these commands:"
-              - "podman push localhost/{{ ee_name }} docker://{{ ee_publush_url }}/{{ ee_name }}:{{ ee_version }}"
-              - "podman push localhost/{{ ee_name }} docker://{{ ee_publush_url }}/{{ ee_name }}:latest"
+              - "podman push localhost/{{ ee_name }}:{{ ee_version }} docker://{{ ee_publush_url }}/{{ ee_name }}:{{ ee_version }}"
+              - "podman push localhost/{{ ee_name }}:{{ ee_version }} docker://{{ ee_publush_url }}/{{ ee_name }}:latest"
             verbosity: 0
       when: ee_publish

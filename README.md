@@ -33,7 +33,7 @@ These are the configuration files
 
 Once the configuration files are set simple execute the build-ee playbook
 ```
-ansible-playbook build-ee.yml
+ansible-playbook build-ee-playbook.yml
 ```
 
 Note that I am using ansible core's ```ansible-playbook``` to run this playbook.
