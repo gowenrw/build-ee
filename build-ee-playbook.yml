@@ -31,7 +31,7 @@
         - name: Build the EE - This can take a LONG time - set a 60min async timeout
           ansible.builtin.shell:
             chdir: "{{ ee_dir }}"
-            cmd: "ansible-builder build -v3 --file execution-environment.yml --tag={{ ee_name }}:{{ ee_version }} --squash all"
+            cmd: "ansible-builder build -v3 --file config-ee.yml --tag={{ ee_name }}:{{ ee_version }} --squash all"
           async: 3600
           poll: 15
           register: reg_buildee_result
