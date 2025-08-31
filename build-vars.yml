@@ -13,7 +13,7 @@ ee_name: cloud-creator-awx-ee
 #
 # ee_version is the version tag for the image we are building
 #
-ee_version: 3.0
+ee_version: 3.1
 #
 # ee_dir is the build directory where the temp build artifacts are created
 #

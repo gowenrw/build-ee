@@ -32,7 +32,7 @@
     # BUILD Using Podman
     - name: EE Build Block - using podman
       block:
-        - name: Build the EE - This can take a LONG time - set a 60min async timeout
+        - name: Build the EE using podman - This can take a LONG time - set a 60min async timeout
           ansible.builtin.shell:
             chdir: "{{ ee_dir }}"
             cmd: "ansible-builder build -v3 --file config-ee.yml --tag={{ ee_name }}:{{ ee_version }} --squash new"
@@ -120,7 +120,7 @@
     # BUILD Using Docker
     - name: EE Build Block - using docker
       block:
-        - name: Build the EE - This can take a LONG time - set a 60min async timeout
+        - name: Build the EE using docker - This can take a LONG time - set a 60min async timeout
           ansible.builtin.shell:
             chdir: "{{ ee_dir }}"
             cmd: "ansible-builder build -v3 -container-runtime=docker --file config-ee.yml --tag={{ ee_name }}:{{ ee_version }}"
