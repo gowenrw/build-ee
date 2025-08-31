@@ -14,6 +14,14 @@ dependencies:
   python_interpreter:
     package_system: python3.11
     python_path: /usr/bin/python3.11
+  exclude:
+      # python:
+      #     - docker
+      # Prevent any python version but 3.11 from installing
+      system:
+          - python3
+          - python3.9
+          - python3.12
   ansible_core:
     # Require minimum of 2.15 to get ansible-inventory --limit option
     package_pip: ansible-core>=2.15.0rc2
@@ -47,7 +55,6 @@ dependencies:
       - name: redhatinsights.insights
       - name: theforeman.foreman
   system: |
-    # These are from awx-ee modified slightly for my use
     git-core [platform:rpm]
     python3.11-devel [platform:rpm compile]
     libcurl-devel [platform:rpm compile]
@@ -67,7 +74,6 @@ dependencies:
     gcc-c++ [platform:rpm compile]
     make [platform:rpm compile]
     openssl-devel [platform:rpm compile]
-    podman-remote [platform:rpm]
     openssl [platform:rpm]
     libxml2-devel [platform:rpm]
   python: |
@@ -89,6 +95,9 @@ dependencies:
     netaddr
     selinux
     xmltodict
+    # vulnerability fixes
+    # setuptools>=78.1.1
+    # python3-cryptography>=42.0.0
 #
 #additional_build_files:
 #  - src: files/ansible.cfg
