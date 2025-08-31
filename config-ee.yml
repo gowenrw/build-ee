@@ -19,7 +19,7 @@ dependencies:
       #     - docker
       # Prevent any python version but 3.11 from installing
       system:
-          - python3
+          - python3<3.9.30
           - python3.9
           - python3.12
   ansible_core:
