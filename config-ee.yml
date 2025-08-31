@@ -4,10 +4,11 @@ version: 3
 # and has nothing to do with your ee image version tag
 images:
   base_image:
-    name: quay.io/centos/centos:stream9
+    name: quay.io/centos/centos:stream9-minimal
+    #name: quay.io/centos/centos:stream9
 #
 options:
-  package_manager_path: /usr/bin/dnf
+  package_manager_path: /usr/bin/microdnf
 #
 dependencies:
   python_interpreter:
