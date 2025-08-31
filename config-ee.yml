@@ -6,6 +6,9 @@ images:
   base_image:
     name: quay.io/centos/centos:stream9
 #
+options:
+  package_manager_path: /usr/bin/dnf
+#
 dependencies:
   python_interpreter:
     package_system: python3.11
@@ -18,34 +21,29 @@ dependencies:
   galaxy: |
     ---
     collections:
-      # These are from awx.ee
       - name: amazon.aws
+      - name: ansible.netcommon
+      - name: ansible.network
       - name: ansible.posix
+      - name: ansible.security
+      - name: ansible.snmp
+      - name: ansible.utils
       - name: ansible.windows
+      - name: ansible.yang
       - name: awx.awx
       - name: azure.azcollection
-        version: "==2.7.0"
-      - name: community.vmware
+      - name: cloud.common
+      - name: cloud.terraform
+      - name: community.aws
+      - name: community.crypto
+      - name: community.general
+      - name: community.windows
       - name: google.cloud
       - name: kubernetes.core
       - name: kubevirt.core
       - name: openstack.cloud
-      - name: ovirt.ovirt
       - name: redhatinsights.insights
       - name: theforeman.foreman
-      # These are what I added
-      - name: ansible.netcommon
-      - name: ansible.network
-      - name: ansible.security
-      - name: ansible.snmp
-      - name: ansible.utils
-      - name: ansible.yang
-      - name: cloud.common
-      - name: cloud.terraform
-      - name: community.crypto
-      - name: community.general
-      - name: community.windows
-      - name: containers.podman
   system: |
     # These are from awx-ee modified slightly for my use
     git-core [platform:rpm]
@@ -53,24 +51,28 @@ dependencies:
     libcurl-devel [platform:rpm compile]
     krb5-devel [platform:rpm compile]
     krb5-workstation [platform:rpm]
+    krb5-libs [platform:rpm]
     subversion [platform:rpm]
     git-lfs [platform:rpm]
     sshpass [platform:rpm]
     rsync [platform:rpm]
     epel-release [platform:rpm]
     unzip [platform:rpm]
-    podman-remote [platform:rpm]
+    zip [platform:rpm]
+    findutils [platform:rpm]
+    cmake [platform:rpm compile]
+    gcc [platform:rpm compile]
+    gcc-c++ [platform:rpm compile]
+    make [platform:rpm compile]
     openssl-devel [platform:rpm compile]
-    #   Build Tools - Changed to RPM only so we can dnf remove later
-    cmake [platform:rpm]
-    gcc [platform:rpm]
-    gcc-c++ [platform:rpm]
-    make [platform:rpm]
-    # These are what I added
+    podman-remote [platform:rpm]
+    openssl [platform:rpm]
+    libxml2 [platform:rpm]
     libxml2-devel [platform:rpm]
+    glibc [platform:rpm]
+    groff [platform:rpm]
+    less [platform:rpm]
   python: |
-    # These are from awx-ee
-    #   Changed ansible-sign from git compile to python install
     ansible-sign
     ncclient
     paramiko
@@ -84,14 +86,11 @@ dependencies:
     pyyaml
     six
     receptorctl
-    # These are what I added
     dnspython
     jsonpatch
     netaddr
+    selinux
     xmltodict
-#
-options:
-  package_manager_path: /usr/bin/dnf
 #
 #additional_build_files:
 #  - src: files/ansible.cfg
@@ -109,5 +108,5 @@ additional_build_steps:
     - RUN mkdir -p /var/run/receptor && git lfs install --system
     # SymLink `python` -> `python3.11`
     - RUN alternatives --install /usr/bin/python python /usr/bin/python3.11 311 && alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 311
-    # Remove build tools and clean
-    - RUN dnf remove -y make cmake gcc gcc-c++ cpp && dnf clean all && rm -rf /tmp/*
+    # Clean Build
+    - RUN $PKGMGR clean all && rm -rf /tmp/*
