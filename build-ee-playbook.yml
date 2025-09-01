@@ -165,12 +165,12 @@
       block:
         - name: Publish the ee image with version tag to container registry
           ansible.builtin.shell:
-            cmd: "docker push localhost/{{ ee_name }}:{{ ee_version }} docker://{{ ee_publish_url }}/{{ ee_name }}:{{ ee_version }}"
+            cmd: "docker tag {{ ee_name }}:{{ ee_version }} docker://{{ ee_publish_url }}/{{ ee_name }}:{{ ee_version }} && docker push docker://{{ ee_publish_url }}/{{ ee_name }}:{{ ee_version }}"
           register: reg_publishd_results
         # LATEST TAG
         - name: Publish the ee image with latest tag to container registry
           ansible.builtin.shell:
-            cmd: "docker push localhost/{{ ee_name }}:{{ ee_version }} docker://{{ ee_publish_url }}/{{ ee_name }}:latest"
+            cmd: "docker tag {{ ee_name }}:{{ ee_version }} docker://{{ ee_publish_url }}/{{ ee_name }}:latest && docker push docker://{{ ee_publish_url }}/{{ ee_name }}:latest"
           register: reg_publishd_latest_results
           when: ee_publish_latest
         #
@@ -193,8 +193,8 @@
               - "docker login -u <docker-username> -p <docker-passwd-or-token> docker.io/<docker-username>"
               - ""
               - "After providing credentials attempt to publish again using these commands:"
-              - "docker push localhost/{{ ee_name }}:{{ ee_version }} docker://{{ ee_publish_url }}/{{ ee_name }}:{{ ee_version }}"
-              - "docker push localhost/{{ ee_name }}:{{ ee_version }} docker://{{ ee_publish_url }}/{{ ee_name }}:latest"
+              - "docker tag {{ ee_name }}:{{ ee_version }} docker://{{ ee_publish_url }}/{{ ee_name }}:{{ ee_version }} && docker push docker://{{ ee_publish_url }}/{{ ee_name }}:{{ ee_version }}"
+              - "docker tag {{ ee_name }}:{{ ee_version }} docker://{{ ee_publish_url }}/{{ ee_name }}:latest && docker push docker://{{ ee_publish_url }}/{{ ee_name }}:latest"
             verbosity: 0
       when: 
         - ee_publish
