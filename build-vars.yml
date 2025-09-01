@@ -1,17 +1,23 @@
 ---
 # Variables for build-ee playbook
 #
-# ee_name is the image name for the execution environment
+# ee_container_runtime is the container tool to use for building the image
+# ansible-builder defaults to podman but can use docker if preferred
+# valid options are 'podman' or 'docker'
+#
+ee_container_runtime: docker
+#
+# ee_name is the image name for the execution environment we are building
 #
 ee_name: cloud-creator-awx-ee
+#
+# ee_version is the version tag for the image we are building
+#
+ee_version: 4.0
 #
 # ee_dir is the build directory where the temp build artifacts are created
 #
 ee_dir: "~/ee/{{ ee_name }}"
-#
-# ee_version is the version tag for the image
-#
-ee_version: 3.0
 #
 # ee_build is a boolean to toggle building the image locally
 # change ee_build to false to skip the build, handy for just publishing
@@ -33,4 +39,4 @@ ee_publish_latest: false
 # This is the base url for the main container repository where container repos are stored
 # If using docker hub like I do then change 'altbier' below to your docker hub username
 #
-ee_publush_url: "docker.io/altbier"
+ee_publish_url: "docker.io/altbier"
