@@ -123,7 +123,7 @@
         - name: Build the EE using docker - This can take a LONG time - set a 60min async timeout
           ansible.builtin.shell:
             chdir: "{{ ee_dir }}"
-            cmd: "ansible-builder build -v3 -container-runtime=docker --file config-ee.yml --tag={{ ee_name }}:{{ ee_version }}"
+            cmd: "ansible-builder build -v3 --container-runtime=docker --file config-ee.yml --tag={{ ee_name }}:{{ ee_version }}"
           async: 3600
           poll: 15
           register: reg_buildeed_result
