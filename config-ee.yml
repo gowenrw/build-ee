@@ -35,7 +35,7 @@ dependencies:
     #   - junipernetworks.junos
   ansible_core:
     # Require minimum of 2.15 to get ansible-inventory --limit option
-    package_pip: ansible-core>=2.15.0rc2
+    package_pip: ansible-core>=2.19
     #package_pip: ansible-core>=2.15.0rc2,<2.16
   ansible_runner:
     package_pip: ansible-runner
@@ -43,28 +43,51 @@ dependencies:
     ---
     collections:
       - name: amazon.aws
+        version: "==10.1.1"
       - name: ansible.netcommon
+        version: "==8.1.0"
       - name: ansible.network
+        version: "==5.0.0"
       - name: ansible.posix
+        version: "==2.1.0"
       - name: ansible.security
+        version: "==4.0.0"
       - name: ansible.snmp
+        version: "==3.0.0"
       - name: ansible.utils
+        version: "==6.0.0"
       - name: ansible.windows
+        version: "==3.2.0"
       - name: ansible.yang
+        version: "==3.0.0"
       - name: awx.awx
+        version: "==24.6.1"
       - name: azure.azcollection
+        version: "==3.8.0"
       - name: cloud.common
+        version: "==5.0.0"
       - name: cloud.terraform
+        version: "==4.0.0"
       - name: community.aws
+        version: "==10.0.0"
       - name: community.crypto
+        version: "==3.0.3"
       - name: community.general
+        version: "==11.2.1"
       - name: community.windows
+        version: "==3.0.1"
       - name: google.cloud
+        version: "==1.7.0"
       - name: kubernetes.core
+        version: "==6.1.0"
       - name: kubevirt.core
+        version: "==2.2.3"
       - name: openstack.cloud
+        version: "==2.4.1"
       - name: redhatinsights.insights
+        version: "==1.3.0"
       - name: theforeman.foreman
+        version: "==5.5.0"
   system: |
     git-core [platform:rpm]
     python3.11-devel [platform:rpm compile]
