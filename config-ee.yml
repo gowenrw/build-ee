@@ -4,25 +4,35 @@ version: 3
 # and has nothing to do with your ee image version tag
 images:
   base_image:
-    # name: quay.io/centos/centos:stream9-minimal
-    name: quay.io/centos/centos:stream9
+    name: quay.io/centos/centos:stream9-minimal
+    # name: quay.io/centos/centos:stream9
 #
 options:
-  # package_manager_path: /usr/bin/microdnf
-  package_manager_path: /usr/bin/dnf
+  package_manager_path: /usr/bin/microdnf
+  # package_manager_path: /usr/bin/dnf
 #
 dependencies:
   python_interpreter:
     package_system: python3.11
     python_path: /usr/bin/python3.11
-  # exclude:
-  #   python:
-  #     - docker
-  #   system:
-  #     - python3-rpm
-  #     - python3.12
-  #   all_from_collections:
-  #     - junipernetworks.junos
+  exclude:
+    # python:
+    #   - docker
+    system:
+      # added rpm to system req to ensure 3.11
+      - python3-rpm
+      # added six to python req to ensure 3.11
+      - python3-six
+      # added lxml to python req to ensure 3.11
+      - python3-lxml
+      # added cffi to python req to ensure 3.11
+      - python3-cffi
+      # added cryptography to python req to ensure 3.11
+      - python3-cryptography
+      # added pycparser to python req to ensure 3.11
+      - python3-pycparser
+    # all_from_collections:
+    #   - junipernetworks.junos
   ansible_core:
     # Require minimum of 2.15 to get ansible-inventory --limit option
     package_pip: ansible-core>=2.15.0rc2
@@ -32,29 +42,29 @@ dependencies:
   galaxy: |
     ---
     collections:
-      # - name: amazon.aws
-      # - name: ansible.netcommon
-      # - name: ansible.network
+      - name: amazon.aws
+      - name: ansible.netcommon
+      - name: ansible.network
       - name: ansible.posix
-      # - name: ansible.security
-      # - name: ansible.snmp
-      # - name: ansible.utils
-      # - name: ansible.windows
-      # - name: ansible.yang
-      # - name: awx.awx
-      # - name: azure.azcollection
-      # - name: cloud.common
-      # - name: cloud.terraform
-      # - name: community.aws
-      # - name: community.crypto
-      # - name: community.general
-      # - name: community.windows
-      # - name: google.cloud
-      # - name: kubernetes.core
-      # - name: kubevirt.core
-      # - name: openstack.cloud
-      # - name: redhatinsights.insights
-      # - name: theforeman.foreman
+      - name: ansible.security
+      - name: ansible.snmp
+      - name: ansible.utils
+      - name: ansible.windows
+      - name: ansible.yang
+      - name: awx.awx
+      - name: azure.azcollection
+      - name: cloud.common
+      - name: cloud.terraform
+      - name: community.aws
+      - name: community.crypto
+      - name: community.general
+      - name: community.windows
+      - name: google.cloud
+      - name: kubernetes.core
+      - name: kubevirt.core
+      - name: openstack.cloud
+      - name: redhatinsights.insights
+      - name: theforeman.foreman
   system: |
     git-core [platform:rpm]
     python3.11-devel [platform:rpm compile]
@@ -89,7 +99,12 @@ dependencies:
     pexpect>=4.5
     python-daemon
     pyyaml
+    rpm
     six
+    lxml
+    cffi
+    cryptography
+    pycparser
     receptorctl
     dnspython
     jsonpatch
@@ -107,17 +122,11 @@ additional_build_steps:
     - RUN $PYCMD -m pip install -U pip
     # SymLink `python` -> `python3.11`
     - RUN alternatives --install /usr/bin/python python /usr/bin/python3.11 311 && alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 311
-  prepend_galaxy:
-    # SymLink `python` -> `python3.11`
-    - RUN alternatives --install /usr/bin/python python /usr/bin/python3.11 311 && alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 311
+  # prepend_galaxy:
   # append_galaxy:
-  prepend_builder:
-    # SymLink `python` -> `python3.11`
-    - RUN alternatives --install /usr/bin/python python /usr/bin/python3.11 311 && alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 311
+  # prepend_builder:
   # append_builder:
-  prepend_final:
-    # SymLink `python` -> `python3.11`
-    - RUN alternatives --install /usr/bin/python python /usr/bin/python3.11 311 && alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 311
+  # prepend_final:
   append_final:
     # Receptor
     - COPY --from=quay.io/ansible/receptor:devel /usr/bin/receptor /usr/bin/receptor
